@@ -1,6 +1,9 @@
 package nl.edegier;
 
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
 
 /**
  * Created by Erwin on 28/09/2016.
@@ -13,24 +16,28 @@ public class MainVerticle {
 
 
 //        HttpClient client = vertx.createHttpClient();
-//        Future f1 = Future.future();
-//        Future f2 = Future.future();
-//        client.getNow(80, "jsonplaceholder.typicode.com", "/posts/1", result ->{
-//            System.out.println(result.statusCode());
-//            result.bodyHandler(body -> f1.complete(body));
-//        });
+//        Future f1 = get(80, "jsonplaceholder.typicode.com", "/posts/1", client);
+//        Future f2 = get(80, "jsonplaceholder.typicode.com", "/posts/2", client);
 //
-//        client.getNow(80, "jsonplaceholder.typicode.com", "/posts/2", result ->{
-//            System.out.println(result.statusCode());
-//            result.bodyHandler(body -> f2.complete(body));
-//        });
 //        CompositeFuture.all(f1, f2).setHandler(ar -> {
 //            if (ar.succeeded()) {
 //                ar.result().list().forEach(System.out::println);
 //            } else {
 //                // At least one server failed
+//                System.out.println("failed");
 //            }
 //        });
     }
 
+    private static Future get(int port, String host, String path, HttpClient client){
+        Future future = Future.future();
+        HttpClientRequest request = client.get(port, host, path, result ->{
+            System.out.println(result.statusCode());
+            result.bodyHandler(body -> future.complete(body));
+            result.exceptionHandler(error -> future.fail(error));
+        });
+        request.exceptionHandler(error -> future.fail(error));
+        request.end();
+        return future;
+    }
 }
