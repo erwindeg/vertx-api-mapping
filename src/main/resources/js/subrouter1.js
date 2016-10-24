@@ -10,14 +10,15 @@ restAPI.get("/hello").handler(function (rc) {
 
  var client = vertx.createHttpClient();
 
- var  call1Future = Restclient.get(80, "jsonplaceholder.typicode.com2", "/posts/1",client);
+ var  call1Future = Restclient.get(80, "jsonplaceholder.typicode.com", "/posts/1",client);
  var call2Future = Restclient.get(80, "jsonplaceholder.typicode.com", "/posts/2",client);
 
   CompositeFuture.all(call1Future,call2Future).setHandler(function(result, error){
         if (error == null) {
+            console.log(result);
             var posts = [];
-            posts.push(JSON.parse(futures.result(0)));
-            posts.push(JSON.parse(futures.result(1)));
+            posts.push(JSON.parse(result.result(0)));
+            posts.push(JSON.parse(result.result(1)));
             rc.response().putHeader("content-type", "application/json");
             rc.response().setChunked(true);
             rc.response().write(JSON.stringify(posts)).end();
